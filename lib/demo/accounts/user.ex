@@ -3,12 +3,14 @@ defmodule Demo.Accounts.User do
 
   import Ecto.Changeset
 
+  @derive {Poison.Encoder, only: [:email, :provider]}
+
   schema "users" do
     field :email, :string
     field :provider, :string
     field :token, :string
-    field :username, :string
-    field :password, :string
+    # field :username, :string
+    # field :password, :string
     has_many :posts, Demo.Posts.Post
     has_many :comments, Demo.Posts.Comment
 

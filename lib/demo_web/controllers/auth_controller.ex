@@ -7,24 +7,32 @@ defmodule DemoWeb.AuthController do
   plug Ueberauth
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
-    user_params = %{
-      token: auth.credentials.token,
-      email: auth.info.email,
-      provider: Atom.to_string(auth.provider)
-    }
+    case auth.info.email do
+      nil ->
+        # require IEx; IEx.pry
+        conn
+        |> put_flash(:error, "Provided email is empty")
+        |> redirect(to: Routes.post_path(conn, :index))
+      email ->
+        user_params = %{
+          token: auth.credentials.token,
+          email: auth.info.email,
+          provider: Atom.to_string(auth.provider)
+        }
 
-    changeset = User.changeset(%User{}, user_params)
+        changeset = User.changeset(%User{}, user_params)
 
-    signin(conn, changeset)
+        sign_in(conn, changeset)
+    end
   end
 
-  def signout(conn, _params) do
+  def sign_out(conn, _params) do
     conn
     |> configure_session(drop: true)
     |> redirect(to: Routes.post_path(conn, :index))
   end
 
-  defp signin(conn, changeset) do
+  defp sign_in(conn, changeset) do
     case insert_or_update_user(changeset) do
       {:ok, user} ->
         conn

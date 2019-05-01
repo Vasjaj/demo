@@ -2,6 +2,8 @@ defmodule Demo.Posts.Comment do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Poison.Encoder, only: [:content, :user]}
+
   schema "comments" do
     field :content, :string
     belongs_to :user, Demo.Accounts.User
@@ -13,7 +15,7 @@ defmodule Demo.Posts.Comment do
   @doc false
   def changeset(comment, attrs) do
     comment
-    |> cast(attrs, [:content, :content])
-    |> validate_required([:content, :content])
+    |> cast(attrs, [:content])
+    |> validate_required([:content])
   end
 end

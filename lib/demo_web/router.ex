@@ -7,6 +7,7 @@ defmodule DemoWeb.Router do
     plug :fetch_flash
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug DemoWeb.Plugs.SetUser
   end
 
   pipeline :api do
@@ -23,7 +24,7 @@ defmodule DemoWeb.Router do
     end
 
     scope "/auth" do
-      get "/signout",            AuthController, :signout
+      get "/sign_out",            AuthController, :sign_out
       get "/:provider",          AuthController, :request
       get "/:provider/callback", AuthController, :callback
     end
