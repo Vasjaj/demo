@@ -52,8 +52,8 @@ defmodule Demo.MixProject do
       {:ueberauth_github, "~> 0.7"},
       # {:ueberauth_instagram, "~> 0.1"},
       {:ueberauth_twitter, "~> 0.3.0"},
-      {:poison, "~> 3.1"}
-
+      {:poison, "~> 3.1"},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false}
     ]
   end
 
