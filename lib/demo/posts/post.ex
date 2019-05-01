@@ -6,7 +6,7 @@ defmodule Demo.Posts.Post do
     field :content, :string
     field :title, :string
     belongs_to :user, Demo.Accounts.User
-    has_many :comments, Demo.Posts.Comment
+    has_many :comments, Demo.Posts.Comment, on_delete: :delete_all
 
     timestamps()
   end

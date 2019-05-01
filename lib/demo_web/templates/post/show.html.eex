@@ -7,19 +7,28 @@
     <%= @post.title %>
   </li>
 
+  <%= if @post.user_id do %>
+    <li>
+      <strong>Created by:</strong>
+      <%= @post.user.email %>
+    </li>
+  <% end %>
+
   <li>
     <strong>Content:</strong>
     <%= @post.content %>
   </li>
-
 </ul>
 
-<span><%= link "Edit", to: Routes.post_path(@conn, :edit, @post) %></span>
+<%= if @conn.assigns.user && @post.user_id == @conn.assigns.user.id do %>
+  <span><%= link "Edit", to: Routes.post_path(@conn, :edit, @post) %></span>
+<% end %>
+
 <span><%= link "Back", to: Routes.post_path(@conn, :index) %></span>
 
-<div class="input-field">
-  <textarea class="meterialize-textarea"></textarea>
-  <button class="btn">Add Comment</button>
+<div>
+  <textarea></textarea>
+  <button>Add Comment</button>
   <ul class="collection">
 
   </ul>

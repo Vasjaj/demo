@@ -17,21 +17,22 @@ defmodule DemoWeb.Router do
   scope "/", DemoWeb do
     pipe_through [:browser]
 
-    get "/", PageController, :index
+    get "/", PostController, :index
 
     scope "/posts" do
       resources "/", PostController
     end
 
     scope "/auth" do
-      get "/sign_out",            AuthController, :sign_out
+      get "/sign_out",           AuthController, :sign_out
       get "/:provider",          AuthController, :request
       get "/:provider/callback", AuthController, :callback
     end
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", DemoWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", DemoWeb do
+    pipe_through :api
+
+    get "/fib/:number" , FibController, :fib
+  end
 end

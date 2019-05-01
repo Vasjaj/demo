@@ -3,6 +3,7 @@ defmodule DemoWeb.PostController do
 
   alias Demo.Posts
   alias Demo.Posts.Post
+  alias Demo.Repo
 
   def index(conn, _params) do
     posts = Posts.list_posts()
@@ -15,26 +16,42 @@ defmodule DemoWeb.PostController do
   end
 
   def create(conn, %{"post" => post_params}) do
-    case Posts.create_post(post_params) do
+    changeset =
+      conn.assigns.user
+      |> Ecto.build_assoc(:posts)
+      |> Post.changeset(post_params)
+
+    case Repo.insert(changeset) do
       {:ok, post} ->
         conn
         |> put_flash(:info, "Post created successfully.")
         |> redirect(to: Routes.post_path(conn, :show, post))
-
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error, changeset} ->
         render(conn, "new.html", changeset: changeset)
     end
   end
 
   def show(conn, %{"id" => id}) do
     post = Posts.get_post!(id)
-    render(conn, "show.html", post: post)
+    render(conn, "show.html", post: Repo.preload(post, :user))
   end
 
   def edit(conn, %{"id" => id}) do
     post = Posts.get_post!(id)
-    changeset = Posts.change_post(post)
-    render(conn, "edit.html", post: post, changeset: changeset)
+
+    cond do
+      conn.assigns.user == nil ->
+        conn
+        |> put_flash(:info, "You are not logged in")
+        |> redirect(to: Routes.post_path(conn, :index))
+      conn.assigns.user && conn.assigns.user.id != post.user_id ->
+        conn
+        |> put_flash(:info, "You are not the owner of this post")
+        |> redirect(to: Routes.post_path(conn, :index))
+      true ->
+        changeset = Posts.change_post(post)
+        render(conn, "edit.html", post: post, changeset: changeset)
+    end
   end
 
   def update(conn, %{"id" => id, "post" => post_params}) do
@@ -52,11 +69,23 @@ defmodule DemoWeb.PostController do
   end
 
   def delete(conn, %{"id" => id}) do
+    require IEx; IEx.pry
     post = Posts.get_post!(id)
-    {:ok, _post} = Posts.delete_post(post)
 
-    conn
-    |> put_flash(:info, "Post deleted successfully.")
-    |> redirect(to: Routes.post_path(conn, :index))
+    cond do
+      conn.assigns.user == nil ->
+        conn
+        |> put_flash(:info, "You are not logged in")
+        |> redirect(to: Routes.post_path(conn, :index))
+      conn.assigns.user && conn.assigns.user.id != post.user_id ->
+        conn
+        |> put_flash(:info, "You are not the owner of this post")
+        |> redirect(to: Routes.post_path(conn, :index))
+      true ->
+        {:ok, _post} = Posts.delete_post(post)
+        conn
+        |> put_flash(:info, "Post deleted successfully.")
+        |> redirect(to: Routes.post_path(conn, :index))
+    end
   end
 end

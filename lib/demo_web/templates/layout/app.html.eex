@@ -16,9 +16,24 @@
     <header>
       <section class="container">
         <nav role="navigation">
+          <%= if @conn.assigns.user do %>
           <ul>
-            <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
+            <li>
+              <strong>Logged in as:</strong> <%= @conn.assigns.user.email %>
+            </li>
+            
+            <li>
+              <strong>Via:</strong> <%= @conn.assigns.user.provider %>
+            </li>
+            
+            <li><a href="/auth/sign_out">Sign Out</a></li>
+            
           </ul>
+        <% else %>
+          <li><a href="/auth/github">Sign in via GitHub</a></li>
+          <li><a href="/auth/twitter">Sign in via Twitter</a></li>
+        <% end %>
+
         </nav>
         <a href="http://phoenixframework.org/" class="phx-logo">
           <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>

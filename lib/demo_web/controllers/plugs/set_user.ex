@@ -1,8 +1,8 @@
 defmodule DemoWeb.Plugs.SetUser do
   import Plug.Conn
 
-  alias Demo.Repo
   alias Demo.Accounts.User
+  alias Demo.Repo
 
   def init(_params) do
   end
