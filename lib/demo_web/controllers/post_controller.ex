@@ -17,9 +17,14 @@ defmodule DemoWeb.PostController do
 
   def create(conn, %{"post" => post_params}) do
     changeset =
-      conn.assigns.user
-      |> Ecto.build_assoc(:posts)
-      |> Post.changeset(post_params)
+      if conn.assigns.user do
+        conn.assigns.user
+        |> Ecto.build_assoc(:posts)
+        |> Post.changeset(post_params)
+      else
+        %Post{}
+        |> Post.changeset(post_params)
+      end
 
     case Repo.insert(changeset) do
       {:ok, post} ->
@@ -69,7 +74,6 @@ defmodule DemoWeb.PostController do
   end
 
   def delete(conn, %{"id" => id}) do
-    require IEx; IEx.pry
     post = Posts.get_post!(id)
 
     cond do
